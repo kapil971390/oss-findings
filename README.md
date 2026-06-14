@@ -8,10 +8,10 @@
 
 <div align="center">
 
-[![Total Findings](https://img.shields.io/badge/Total%20Findings-5-0f0c29?style=flat-square&logo=github)](.)
+[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-9+-0f0c29?style=flat-square)](.)
+[![Total Reported](https://img.shields.io/badge/Total%20Reported-8-302b63?style=flat-square)](.)
 [![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-2-2ea44f?style=flat-square)](.)
 [![PRs Open](https://img.shields.io/badge/PRs%20Open-1-f0a500?style=flat-square)](.)
-[![Under Review](https://img.shields.io/badge/Under%20Review-2-302b63?style=flat-square)](.)
 
 </div>
 
@@ -19,102 +19,137 @@
 
 ## 📌 Methodology
 
-Each finding comes from deep commit-level analysis — examining what changed between two revisions, identifying callers that were not updated, and verifying the behavioral contract break is reproducible.
+Each finding comes from deep commit-level diff analysis — examining what changed between revisions, identifying callers that weren't updated, and verifying the behavioral contract break is real.
 
 **What I look for:**
 - Silent return value changes (`null` / empty instead of expected data)
 - Exception scope widening (`except AttributeError` → `except Exception`)
-- Parameter removals that break callers without a compile error
+- Parameter removals that break callers without a compile-time error
 - Unreachable code masking intended behavior
-- Wrong entity type passed to APIs (e.g. channel ID where guild ID expected)
+- Wrong entity type passed to external APIs
 
 ---
 
 ## ✅ Confirmed & Fixed
 
 ### 1 · MoneyPrinterTurbo — Qwen empty `choices[]` crash
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)  
-**Issue:** [#984](https://github.com/harry0703/MoneyPrinterTurbo/issues/984) · **Fix PR:** [#994](https://github.com/harry0703/MoneyPrinterTurbo/pull/994) ✅ Merged
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Issue:** [#984](https://github.com/harry0703/MoneyPrinterTurbo/issues/984) · **Fix PR:** [#994](https://github.com/harry0703/MoneyPrinterTurbo/pull/994) ✅ Merged · **Date:** Jun 4, 2026
 
-When the Qwen API returns an empty `choices[]` array (rate-limit or quota exhausted), the code attempts `response.choices[0]` with no guard — raising an unhandled `IndexError` with no diagnostic message. Users had no way to tell whether the problem was their API key, their quota, or the service itself.
+When the Qwen API returns an empty `choices[]` array (rate-limit or quota exhausted), the code attempts `response.choices[0]` with no guard — raising an unhandled `IndexError` with zero diagnostic context. Users had no way to distinguish a quota issue from a code bug.
 
 ```python
-# Before — unguarded
+# Before — crashes silently
 content = response.choices[0].message.content
 
-# After — with diagnostic
+# After — clear diagnostic
 if not response.choices:
     raise ValueError("Qwen returned empty choices — check API key / quota")
 content = response.choices[0].message.content
 ```
 
-**Maintainer response:** Acknowledged, requested focused PR → merged same day.
+**Response:** Maintainer acknowledged the diagnostics gap, requested a focused PR → merged same day. A community contributor also offered to help.
 
 ---
 
 ### 2 · MoneyPrinterTurbo — Groq model unvalidated on list-fetch failure
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)  
-**Issue:** [#1013](https://github.com/harry0703/MoneyPrinterTurbo/issues/1013) · **Fix PR:** [#1014](https://github.com/harry0703/MoneyPrinterTurbo/pull/1014) ✅ Merged
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Issue:** [#1013](https://github.com/harry0703/MoneyPrinterTurbo/issues/1013) · **Fix PR:** [#1014](https://github.com/harry0703/MoneyPrinterTurbo/pull/1014) ✅ Merged · **Date:** Jun 10, 2026
 
-When the Groq model list endpoint fails (network error, auth issue), the UI falls back silently to the first entry in a hardcoded list. If that entry is stale or wrong, every subsequent generation call uses the wrong model — no error, no warning.
+When the Groq model list endpoint fails (network error, auth issue), the UI silently falls back to the first entry in a hardcoded list. If that entry is stale, every generation call uses the wrong model — no error, no warning.
 
-**Maintainer response:** Agreed, requested PR → merged.
-
----
-
-## ⏳ Pending
-
-### 3 · MoneyPrinterTurbo — CLI local source validation gaps
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo)  
-**Issue:** [#1032](https://github.com/harry0703/MoneyPrinterTurbo/issues/1032) · **PR:** [#1033](https://github.com/harry0703/MoneyPrinterTurbo/pull/1033) ⏳ Open
-
-The new `cli.py` (merged in PR #1005) accepts `--video-source local` without requiring `--video-materials`, and accepts `--stop-at terms` with local sources even though term generation is skipped for local sources. Both issues cause failures deep into the run with unhelpful errors.
-
-**Fix:** Early argument validation in `parse_args()` with clear error messages.
+**Response:** Maintainer agreed, requested PR → merged.
 
 ---
 
-## 🔍 Under Review
+## ⏳ Open / Pending
 
-### 4 · midjourney-api — `ChannelId` used as `ServerId` in guild API
-**Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api)  
-**Issue:** [#294](https://github.com/erictik/midjourney-api/issues/294) · **File:** `src/command.ts` lines 47–50, 68–70
+### 3 · MoneyPrinterTurbo — CLI `--video-source local` validation gaps
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Issue:** [#1032](https://github.com/harry0703/MoneyPrinterTurbo/issues/1032) · **PR:** [#1033](https://github.com/harry0703/MoneyPrinterTurbo/pull/1033) ⏳ Open · **Date:** Jun 13, 2026
+
+The new `cli.py` accepts `--video-source local` without requiring `--video-materials`, and accepts `--stop-at terms` with local sources even though term generation is skipped for local sources. Both cause failures deep into the run with unhelpful errors.
+
+**Fix:** Early validation in `parse_args()` with clear error messages.
+
+---
+
+### 4 · medusajs/medusa — Race condition in `compensatePaymentIfNeededStep`
+**Repo:** [medusajs/medusa](https://github.com/medusajs/medusa) · **28K+ ⭐**
+**Discussion:** [#15550](https://github.com/medusajs/medusa/discussions/15550) ⏳ Watching · **Date:** Jun 4, 2026
+
+Async workflow step `compensatePaymentIfNeededStep` has a potential race condition where concurrent order fulfillment flows could trigger duplicate payment compensation — leading to double refunds or inconsistent payment state.
+
+---
+
+### 5 · MoneyPrinterTurbo — `>=` comparison risk in duration check
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Issue:** [#985](https://github.com/harry0703/MoneyPrinterTurbo/issues/985) ⏳ Community PR expected · **Date:** Jun 4, 2026
+
+Duration boundary check uses `>=` where `>` is semantically correct — edge-case videos at exact boundary duration may be silently rejected or accepted incorrectly.
+
+**Response:** Community contributor (Sushanth012) offered to submit a fix.
+
+---
+
+## 🔍 Recently Reported
+
+### 6 · midjourney-api — `ChannelId` used as `ServerId` in Discord guild API
+**Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api) · **1.8K ⭐**
+**Issue:** [#294](https://github.com/erictik/midjourney-api/issues/294) 🔍 Open · **Date:** Jun 14, 2026
 
 ```typescript
-// getCommand() and allCommand() both do:
+// getCommand() and allCommand() — src/command.ts lines 68-72
 let serverId = this.config.ServerId;
 if (!serverId) {
-  serverId = this.config.ChannelId;  // ⚠️ Wrong — ChannelId ≠ guild ID
+  serverId = this.config.ChannelId;  // ⚠️ ChannelId ≠ guild ID
 }
 const url = `.../api/v9/guilds/${serverId}/application-command-index`;
 ```
 
-`ServerId` is optional in the config. When omitted, `ChannelId` is used as the guild ID — but Discord's `/guilds/{id}/application-command-index` endpoint requires a **server (guild) ID**, not a channel ID. These are different entity types. The API call either fails or returns commands from the wrong server.
+`ServerId` is optional in config. When omitted, `ChannelId` is used as the guild ID — but Discord's endpoint requires a **server (guild) ID**. Channel IDs and guild IDs are different entity types in Discord's API. The call either returns 404 or wrong data, causing all command operations to fail.
 
 ---
 
-### 5 · midjourney-api — Dead code in `cacheCommand()` — cache never fully populated
-**Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api)  
-**Issue:** [#295](https://github.com/erictik/midjourney-api/issues/295) · **File:** `src/command.ts` lines 39–45
+### 7 · midjourney-api — Dead code in `cacheCommand()` — full cache never populated
+**Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api) · **1.8K ⭐**
+**Issue:** [#295](https://github.com/erictik/midjourney-api/issues/295) 🔍 Open · **Date:** Jun 14, 2026
 
 ```typescript
+// src/command.ts lines 35-45
 async cacheCommand(name: CommandName) {
   if (this.cache[name] !== undefined) return this.cache[name];
   const command = await this.getCommand(name);
   this.cache[name] = command;
-  return command;           // ← returns here
-  this.allCommand();        // ← unreachable: never called
-  return this.cache[name];  // ← unreachable
+  return command;        // ← exits here
+
+  this.allCommand();     // ← dead code: never reached
+  return this.cache[name]; // ← dead code: never reached
 }
 ```
 
-`allCommand()` fetches and caches **all** bot commands in one API call. It was intended to run after the first individual lookup to populate the full cache — but the early `return` makes it dead code. Every subsequent `cacheCommand()` call hits the Discord API individually instead of using the pre-populated cache, causing unnecessary API calls and potential rate limiting.
+`allCommand()` was meant to bulk-fetch all commands on first miss, populating the full cache. The early `return` makes it unreachable — every subsequent `cacheCommand()` call hits Discord's API individually, causing unnecessary requests and potential rate limiting.
+
+---
+
+## 📊 Analysis Log
+
+| Date | Repo | Commits Analyzed | Outcome |
+|:-----|:-----|:----------------:|:--------|
+| Jun 14 | apify/crawlee-python | 3 | Behavioral findings — silent URL filtering, exception propagation change |
+| Jun 14 | tox-dev/tox | 1 | Config override namespace risk identified |
+| Jun 14 | gptme/gptme | 1 | LLM routing refactor — HIGH risk noted |
+| Jun 14 | erictik/midjourney-api | 1 | 2 confirmed bugs → issues #294 #295 opened |
+| Jun 13 | harry0703/MoneyPrinterTurbo | cli.py | Issue #1032 + PR #1033 |
+| Jun 10 | harry0703/MoneyPrinterTurbo | groq fix | Issue #1013 → PR #1014 merged ✅ |
+| Jun 4 | medusajs/medusa | payment step | Discussion #15550 |
+| Jun 4 | harry0703/MoneyPrinterTurbo | qwen fix | Issue #984 → PR #994 merged ✅ |
 
 ---
 
 <div align="center">
 
-*Analysis performed using commit-level diff inspection and cross-module caller tracking.*
+*Commit-level diff analysis · Cross-module caller tracking · Behavioral contract verification*
 
 <br/>
 
