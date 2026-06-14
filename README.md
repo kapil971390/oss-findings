@@ -78,7 +78,7 @@ The new `cli.py` (merged in PR #1005) accepts `--video-source local` without req
 
 ### 4 · midjourney-api — `ChannelId` used as `ServerId` in guild API
 **Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api)  
-**File:** `src/command.ts` lines 47–50, 68–70
+**Issue:** [#294](https://github.com/erictik/midjourney-api/issues/294) · **File:** `src/command.ts` lines 47–50, 68–70
 
 ```typescript
 // getCommand() and allCommand() both do:
@@ -95,7 +95,7 @@ const url = `.../api/v9/guilds/${serverId}/application-command-index`;
 
 ### 5 · midjourney-api — Dead code in `cacheCommand()` — cache never fully populated
 **Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api)  
-**File:** `src/command.ts` lines 39–45
+**Issue:** [#295](https://github.com/erictik/midjourney-api/issues/295) · **File:** `src/command.ts` lines 39–45
 
 ```typescript
 async cacheCommand(name: CommandName) {
