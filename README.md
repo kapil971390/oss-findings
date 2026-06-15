@@ -10,8 +10,8 @@
 
 [![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-10+-0f0c29?style=flat-square)](.)
 [![Total Reported](https://img.shields.io/badge/Total%20Reported-10-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-2-2ea44f?style=flat-square)](.)
-[![PRs Open](https://img.shields.io/badge/PRs%20Open-1-f0a500?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-3-2ea44f?style=flat-square)](.)
+[![PRs Open](https://img.shields.io/badge/PRs%20Open-0-f0a500?style=flat-square)](.)
 
 </div>
 
@@ -62,17 +62,20 @@ When the Groq model list endpoint fails (network error, auth issue), the UI sile
 
 ---
 
-## ⏳ Open / Pending
-
 ### 3 · MoneyPrinterTurbo — CLI `--video-source local` validation gaps
 **Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
-**Issue:** [#1032](https://github.com/harry0703/MoneyPrinterTurbo/issues/1032) · **PR:** [#1033](https://github.com/harry0703/MoneyPrinterTurbo/pull/1033) ⏳ Open · **Date:** Jun 13, 2026
+**Issue:** [#1032](https://github.com/harry0703/MoneyPrinterTurbo/issues/1032) · **Fix PR:** [#1033](https://github.com/harry0703/MoneyPrinterTurbo/pull/1033) ✅ Merged · **Date:** Jun 13, 2026
 
-The new `cli.py` accepts `--video-source local` without requiring `--video-materials`, and accepts `--stop-at terms` with local sources even though term generation is skipped for local sources. Both cause failures deep into the run with unhelpful errors.
+The new `cli.py` accepted `--video-source local` without requiring `--video-materials`, causing failures deep into the run (after LLM + TTS steps) with a generic error. It also accepted `--stop-at terms` with local sources even though term generation is intentionally skipped for local sources — returning `{"terms": ""}` with no error.
 
-**Fix:** Early validation in `parse_args()` with clear error messages.
+Both constraints now checked in `parse_args()` via `parser.error()` — exits immediately with a clear message before any work begins.
+
+**Response:** Maintainer verified locally with 3 test cases, merged. "Thanks for the contribution."
 
 ---
+
+## ⏳ Open / Pending
+
 
 ### 4 · medusajs/medusa — Race condition in `compensatePaymentIfNeededStep`
 **Repo:** [medusajs/medusa](https://github.com/medusajs/medusa) · **28K+ ⭐**
@@ -183,7 +186,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 | Jun 14 | tox-dev/tox | 1 | Config override namespace risk identified |
 | Jun 14 | gptme/gptme | 1 | LLM routing refactor — HIGH risk noted |
 | Jun 14 | erictik/midjourney-api | 1 | 2 confirmed bugs → issues #294 #295 opened |
-| Jun 13 | harry0703/MoneyPrinterTurbo | cli.py | Issue #1032 + PR #1033 |
+| Jun 13 | harry0703/MoneyPrinterTurbo | cli.py | Issue #1032 → PR #1033 merged ✅ |
 | Jun 10 | harry0703/MoneyPrinterTurbo | groq fix | Issue #1013 → PR #1014 merged ✅ |
 | Jun 4 | medusajs/medusa | payment step | Discussion #15550 |
 | Jun 4 | harry0703/MoneyPrinterTurbo | qwen fix | Issue #984 → PR #994 merged ✅ |
