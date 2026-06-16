@@ -8,10 +8,10 @@
 
 <div align="center">
 
-[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-10+-0f0c29?style=flat-square)](.)
-[![Total Reported](https://img.shields.io/badge/Total%20Reported-10-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-3-2ea44f?style=flat-square)](.)
-[![PRs Open](https://img.shields.io/badge/PRs%20Open-0-f0a500?style=flat-square)](.)
+[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-12+-0f0c29?style=flat-square)](.)
+[![Total Reported](https://img.shields.io/badge/Total%20Reported-12-302b63?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-4-2ea44f?style=flat-square)](.)
+[![PRs Open](https://img.shields.io/badge/PRs%20Open-3-f0a500?style=flat-square)](.)
 
 </div>
 
@@ -74,10 +74,31 @@ Both constraints now checked in `parse_args()` via `parser.error()` — exits im
 
 ---
 
+### 4 · CodeceptJS — `--shuffle` flag silently ignored after commit #5438
+**Repo:** [codeceptjs/CodeceptJS](https://github.com/codeceptjs/CodeceptJS) · **10K+ ⭐**
+**Issue:** [#5605](https://github.com/codeceptjs/CodeceptJS/issues/5605) · **Fix PR:** [#5639](https://github.com/codeceptjs/CodeceptJS/pull/5639) ✅ Merged · **Date:** Jun 5, 2026
+
+Commit #5438 refactored test file loading and silently dropped the `shuffle()` call — the `--shuffle` CLI flag was accepted without error but had no effect. Tests always ran in the same order regardless of the flag, breaking randomized test ordering for all users.
+
+```js
+// Before fix — shuffle never called after #5438
+this.testFiles = await this.loader.loadTests(opts);
+
+// After fix — shuffle restored when flag is set
+this.testFiles = await this.loader.loadTests(opts);
+if (opts.shuffle) {
+  this.testFiles = shuffle(this.testFiles);
+}
+```
+
+**Response:** DavertMik (maintainer) merged PR #5639 and said "Thank you for catching it!"
+
+---
+
 ## ⏳ Open / Pending
 
 
-### 4 · medusajs/medusa — Race condition in `compensatePaymentIfNeededStep`
+### 5 · medusajs/medusa — Race condition in `compensatePaymentIfNeededStep`
 **Repo:** [medusajs/medusa](https://github.com/medusajs/medusa) · **28K+ ⭐**
 **Discussion:** [#15550](https://github.com/medusajs/medusa/discussions/15550) ⏳ Watching · **Date:** Jun 4, 2026
 
@@ -85,7 +106,7 @@ Async workflow step `compensatePaymentIfNeededStep` has a potential race conditi
 
 ---
 
-### 5 · MoneyPrinterTurbo — `>=` comparison risk in duration check
+### 6 · MoneyPrinterTurbo — `>=` comparison risk in duration check
 **Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
 **Issue:** [#985](https://github.com/harry0703/MoneyPrinterTurbo/issues/985) ⏳ Community PR expected · **Date:** Jun 4, 2026
 
@@ -97,7 +118,36 @@ Duration boundary check uses `>=` where `>` is semantically correct — edge-cas
 
 ## 🔍 Recently Reported
 
-### 6 · midjourney-api — `ChannelId` used as `ServerId` in Discord guild API
+### 7 · magento/magento2 — `NoSuchEntityException` race condition in `InvalidSkuProcessor` bulk price API
+**Repo:** [magento/magento2](https://github.com/magento/magento2) · **14K+ ⭐**
+**Issue:** [#40882](https://github.com/magento/magento2/issues/40882) · **PR:** [#40883](https://github.com/magento/magento2/pull/40883) 🔍 Open · **Date:** Jun 16, 2026
+
+`retrieveInvalidSkuList()` calls `retrieveProductIdsBySkus()` to build a valid-SKU list, then calls `productRepository->get($sku)` on those SKUs without a try/catch. Between the two calls, a product can be deleted — causing `NoSuchEntityException` to propagate uncaught and fail the entire bulk price update batch, silently discarding all other valid entries.
+
+```php
+// Before — crashes entire batch if product deleted between lookup and fetch
+if ($allowedPriceTypeValue && $type == Type::TYPE_BUNDLE) {
+    $product = $this->productRepository->get($sku);  // ⚠️ throws if deleted
+    ...
+}
+
+// After — graceful handling of race condition
+try {
+    $product = $this->productRepository->get($sku);
+    if ($product->getPriceType() != $allowedPriceTypeValue) {
+        $valueTypeIsAllowed = true;
+    }
+} catch (NoSuchEntityException $e) {
+    $skuDiff[] = $sku;
+    break;
+}
+```
+
+The same pattern was fixed in `TierPriceValidator::checkQuantity()` (ACP2E-4998) but `InvalidSkuProcessor` was missed. Affects all bulk base-price, special-price, and tier-price APIs under concurrent catalog modifications.
+
+---
+
+### 8 · midjourney-api — `ChannelId` used as `ServerId` in Discord guild API
 **Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api) · **1.8K ⭐**
 **Issue:** [#294](https://github.com/erictik/midjourney-api/issues/294) 🔍 Open · **Date:** Jun 14, 2026
 
@@ -114,7 +164,7 @@ const url = `.../api/v9/guilds/${serverId}/application-command-index`;
 
 ---
 
-### 7 · midjourney-api — Dead code in `cacheCommand()` — full cache never populated
+### 9 · midjourney-api — Dead code in `cacheCommand()` — full cache never populated
 **Repo:** [erictik/midjourney-api](https://github.com/erictik/midjourney-api) · **1.8K ⭐**
 **Issue:** [#295](https://github.com/erictik/midjourney-api/issues/295) 🔍 Open · **Date:** Jun 14, 2026
 
@@ -135,7 +185,7 @@ async cacheCommand(name: CommandName) {
 
 ---
 
-### 8 · bagisto — `getClientOriginalName()` path traversal in `RMAImageRepository` — incomplete security fix
+### 10 · bagisto — `getClientOriginalName()` path traversal in `RMAImageRepository` — incomplete security fix
 **Repo:** [bagisto/bagisto](https://github.com/bagisto/bagisto) · **9.1K+ ⭐**
 **Issue:** [#11338](https://github.com/bagisto/bagisto/issues/11338) 🔍 Open · **Date:** Jun 14, 2026
 
@@ -157,7 +207,7 @@ An attacker can upload a file named `../../../../config/database.php` — the cl
 
 ---
 
-### 9 · bagisto — `v-html` XSS in Shop views — `product_name` + datagrid columns unescaped
+### 11 · bagisto — `v-html` XSS in Shop views — `product_name` + datagrid columns unescaped
 **Repo:** [bagisto/bagisto](https://github.com/bagisto/bagisto) · **9.1K+ ⭐**
 **Issue:** [#11339](https://github.com/bagisto/bagisto/issues/11339) 🔍 Open · **Date:** Jun 14, 2026
 
@@ -181,6 +231,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 | Date | Repo | Commits Analyzed | Outcome |
 |:-----|:-----|:----------------:|:--------|
+| Jun 16 | magento/magento2 | ACP2E-4998 adjacent | NoSuchEntityException race → issue #40882 → PR #40883 |
 | Jun 14 | bagisto/bagisto | 2 | 2 security bugs → issues #11338 (path traversal) #11339 (XSS) |
 | Jun 14 | apify/crawlee-python | 3 | Behavioral findings — silent URL filtering, exception propagation change |
 | Jun 14 | tox-dev/tox | 1 | Config override namespace risk identified |
@@ -188,6 +239,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 | Jun 14 | erictik/midjourney-api | 1 | 2 confirmed bugs → issues #294 #295 opened |
 | Jun 13 | harry0703/MoneyPrinterTurbo | cli.py | Issue #1032 → PR #1033 merged ✅ |
 | Jun 10 | harry0703/MoneyPrinterTurbo | groq fix | Issue #1013 → PR #1014 merged ✅ |
+| Jun 5 | codeceptjs/CodeceptJS | commit #5438 | shuffle regression → issue #5605 → PR #5639 merged ✅ |
 | Jun 4 | medusajs/medusa | payment step | Discussion #15550 |
 | Jun 4 | harry0703/MoneyPrinterTurbo | qwen fix | Issue #984 → PR #994 merged ✅ |
 
