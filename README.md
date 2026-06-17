@@ -8,10 +8,11 @@
 
 <div align="center">
 
-[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-12+-0f0c29?style=flat-square)](.)
-[![Total Reported](https://img.shields.io/badge/Total%20Reported-12-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-4-2ea44f?style=flat-square)](.)
+[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-13+-0f0c29?style=flat-square)](.)
+[![Total Reported](https://img.shields.io/badge/Total%20Reported-13-302b63?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-5-2ea44f?style=flat-square)](.)
 [![PRs Open](https://img.shields.io/badge/PRs%20Open-3-f0a500?style=flat-square)](.)
+[![Security Findings](https://img.shields.io/badge/Security%20Findings-1-e11d48?style=flat-square)](.)
 
 </div>
 
@@ -74,7 +75,30 @@ Both constraints now checked in `parse_args()` via `parser.error()` — exits im
 
 ---
 
-### 4 · CodeceptJS — `--shuffle` flag silently ignored after commit #5438
+### 4 · MoneyPrinterTurbo — Credential leak in LLM error path (Security)
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Issue:** [#1049](https://github.com/harry0703/MoneyPrinterTurbo/issues/1049) · **PR:** [#1050](https://github.com/harry0703/MoneyPrinterTurbo/pull/1050) 🔒 Confirmed — Fixed by maintainer · **Date:** Jun 17, 2026
+
+When an LLM provider is configured with a custom `*_base_url` containing embedded credentials (`https://user:pass@host/v1`), the OpenAI SDK raises exceptions whose `str()` includes the raw URL. The bare `except Exception as e: return f"Error: {str(e)}"` block in `_generate_response` surfaced that string verbatim — leaking credentials into API responses and any logging layer that recorded return values.
+
+```python
+# Before — raw exception str leaks https://user:pass@host/v1
+except Exception as e:
+    return f"Error: {str(e)}"
+
+# After — credentials redacted before surfacing
+except Exception as e:
+    return f"Error: {_sanitize_error_message(e)}"
+
+def _sanitize_error_message(msg) -> str:
+    return re.sub(r"(https?://)([^:@/\s]+:[^@/\s]+@)", r"\1***:***@", str(msg))
+```
+
+**Response:** Maintainer confirmed the finding was valid and had already independently fixed the same issue on `main` (commit `a810d67`). Their fix also covers sensitive query params (`api_key`, `access_token`, etc.) + added regression tests. PR #1050 closed as duplicate. Harry noted *"The report and PR helped confirm the right fix path."*
+
+---
+
+### 5 · CodeceptJS — `--shuffle` flag silently ignored after commit #5438
 **Repo:** [codeceptjs/CodeceptJS](https://github.com/codeceptjs/CodeceptJS) · **10K+ ⭐**
 **Issue:** [#5605](https://github.com/codeceptjs/CodeceptJS/issues/5605) · **Fix PR:** [#5639](https://github.com/codeceptjs/CodeceptJS/pull/5639) ✅ Merged · **Date:** Jun 5, 2026
 
@@ -231,6 +255,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 | Date | Repo | Commits Analyzed | Outcome |
 |:-----|:-----|:----------------:|:--------|
+| Jun 17 | harry0703/MoneyPrinterTurbo | llm.py error path | 🔒 Credential leak → issue #1049 → fix confirmed on main (a810d67) |
 | Jun 16 | magento/magento2 | ACP2E-4998 adjacent | NoSuchEntityException race → issue #40882 → PR #40883 |
 | Jun 14 | bagisto/bagisto | 2 | 2 security bugs → issues #11338 (path traversal) #11339 (XSS) |
 | Jun 14 | apify/crawlee-python | 3 | Behavioral findings — silent URL filtering, exception propagation change |
