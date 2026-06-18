@@ -34,7 +34,7 @@ Each finding comes from deep commit-level diff analysis — examining what chang
 ## ✅ Confirmed & Fixed
 
 ### 1 · MoneyPrinterTurbo — Qwen empty `choices[]` crash
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **89K+ ⭐**
 **Issue:** [#984](https://github.com/harry0703/MoneyPrinterTurbo/issues/984) · **Fix PR:** [#994](https://github.com/harry0703/MoneyPrinterTurbo/pull/994) ✅ Merged · **Date:** Jun 4, 2026
 
 When the Qwen API returns an empty `choices[]` array (rate-limit or quota exhausted), the code attempts `response.choices[0]` with no guard — raising an unhandled `IndexError` with zero diagnostic context. Users had no way to distinguish a quota issue from a code bug.
@@ -54,7 +54,7 @@ content = response.choices[0].message.content
 ---
 
 ### 2 · MoneyPrinterTurbo — Groq model unvalidated on list-fetch failure
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **89K+ ⭐**
 **Issue:** [#1013](https://github.com/harry0703/MoneyPrinterTurbo/issues/1013) · **Fix PR:** [#1014](https://github.com/harry0703/MoneyPrinterTurbo/pull/1014) ✅ Merged · **Date:** Jun 10, 2026
 
 When the Groq model list endpoint fails (network error, auth issue), the UI silently falls back to the first entry in a hardcoded list. If that entry is stale, every generation call uses the wrong model — no error, no warning.
@@ -64,7 +64,7 @@ When the Groq model list endpoint fails (network error, auth issue), the UI sile
 ---
 
 ### 3 · MoneyPrinterTurbo — CLI `--video-source local` validation gaps
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **89K+ ⭐**
 **Issue:** [#1032](https://github.com/harry0703/MoneyPrinterTurbo/issues/1032) · **Fix PR:** [#1033](https://github.com/harry0703/MoneyPrinterTurbo/pull/1033) ✅ Merged · **Date:** Jun 13, 2026
 
 The new `cli.py` accepted `--video-source local` without requiring `--video-materials`, causing failures deep into the run (after LLM + TTS steps) with a generic error. It also accepted `--stop-at terms` with local sources even though term generation is intentionally skipped for local sources — returning `{"terms": ""}` with no error.
@@ -76,7 +76,7 @@ Both constraints now checked in `parse_args()` via `parser.error()` — exits im
 ---
 
 ### 4 · MoneyPrinterTurbo — Credential leak in LLM error path (Security)
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **89K+ ⭐**
 **Issue:** [#1049](https://github.com/harry0703/MoneyPrinterTurbo/issues/1049) · **PR:** [#1050](https://github.com/harry0703/MoneyPrinterTurbo/pull/1050) 🔒 Confirmed — Fixed by maintainer · **Date:** Jun 17, 2026
 
 When an LLM provider is configured with a custom `*_base_url` containing embedded credentials (`https://user:pass@host/v1`), the OpenAI SDK raises exceptions whose `str()` includes the raw URL. The bare `except Exception as e: return f"Error: {str(e)}"` block in `_generate_response` surfaced that string verbatim — leaking credentials into API responses and any logging layer that recorded return values.
@@ -163,7 +163,7 @@ Async workflow step `compensatePaymentIfNeededStep` has a potential race conditi
 ---
 
 ### 6 · MoneyPrinterTurbo — `>=` comparison risk in duration check
-**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **22K+ ⭐**
+**Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **89K+ ⭐**
 **Issue:** [#985](https://github.com/harry0703/MoneyPrinterTurbo/issues/985) ⏳ Community PR expected · **Date:** Jun 4, 2026
 
 Duration boundary check uses `>=` where `>` is semantically correct — edge-case videos at exact boundary duration may be silently rejected or accepted incorrectly.
