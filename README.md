@@ -8,9 +8,9 @@
 
 <div align="center">
 
-[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-13+-0f0c29?style=flat-square)](.)
-[![Total Reported](https://img.shields.io/badge/Total%20Reported-13-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-5-2ea44f?style=flat-square)](.)
+[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-14+-0f0c29?style=flat-square)](.)
+[![Total Reported](https://img.shields.io/badge/Total%20Reported-14-302b63?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-6-2ea44f?style=flat-square)](.)
 [![PRs Open](https://img.shields.io/badge/PRs%20Open-3-f0a500?style=flat-square)](.)
 [![Security Findings](https://img.shields.io/badge/Security%20Findings-1-e11d48?style=flat-square)](.)
 
@@ -118,6 +118,38 @@ if (opts.shuffle) {
 **Response:** DavertMik (maintainer) merged PR #5639 and said "Thank you for catching it!"
 
 ---
+
+
+---
+
+### 6 · penpot — Stale MCP token shown after regeneration
+**Repo:** [penpot/penpot](https://github.com/penpot/penpot) · **50K+ ⭐**
+**Issue:** [#10279](https://github.com/penpot/penpot/issues/10279) · **Fix PR:** [#10280](https://github.com/penpot/penpot/pull/10280) ✅ Merged in v2.17.0 · **Date:** Jun 18, 2026
+
+After the MCP state management refactor (PR #10226), the `on-created` callback in both `generate-mcp-token-modal` and `regenerate-mcp-token-modal` no longer called `fetch-access-tokens`. The call had been in `create-token*`'s `on-success` handler but was not carried forward to the new callbacks.
+
+```clojure
+;; profile.cljs — access-token-created was doing an optimistic conj:
+(update state :access-tokens conj access-token)
+;; ↑ leaves old (server-deleted) token as first match in the vector
+
+;; create-access-token never triggered a re-fetch after the optimistic add.
+;; d/seek in mcp-server-section* returns the FIRST mcp token → old stale data shown.
+```
+
+Result: after regenerating an MCP token, the Integrations page showed the old (now server-deleted) token's string, expiry, and server URL until the user manually refreshed the page. The bug was in `profile.cljs`, not in the UI components.
+
+```clojure
+;; Fix — remove optimistic conj, chain fetch-access-tokens after API call:
+(->> (rp/cmd! :create-access-token params)
+     (rx/tap on-success)
+     (rx/mapcat (fn [token]
+                  (rx/of (access-token-created token)
+                         (fetch-access-tokens)))))  ;; ← ensures fresh state
+```
+
+**Response:** niwinz (core maintainer, original PR author) confirmed the bug, suggested this exact fix approach, and merged same day. Added to milestone v2.17.0.
+
 
 ## ⏳ Open / Pending
 
@@ -255,6 +287,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 | Date | Repo | Commits Analyzed | Outcome |
 |:-----|:-----|:----------------:|:--------|
+| Jun 18 | penpot/penpot | MCP token state refactor | MCP token stale state → issue #10279 → PR #10280 merged in v2.17.0 ✅ |
 | Jun 17 | harry0703/MoneyPrinterTurbo | llm.py error path | 🔒 Credential leak → issue #1049 → fix confirmed on main (a810d67) |
 | Jun 16 | magento/magento2 | ACP2E-4998 adjacent | NoSuchEntityException race → issue #40882 → PR #40883 |
 | Jun 14 | bagisto/bagisto | 2 | 2 security bugs → issues #11338 (path traversal) #11339 (XSS) |
