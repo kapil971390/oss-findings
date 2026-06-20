@@ -8,11 +8,11 @@
 
 <div align="center">
 
-[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-14+-0f0c29?style=flat-square)](.)
-[![Total Reported](https://img.shields.io/badge/Total%20Reported-14-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-6-2ea44f?style=flat-square)](.)
+[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-15+-0f0c29?style=flat-square)](.)
+[![Total Reported](https://img.shields.io/badge/Total%20Reported-15-302b63?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-7-2ea44f?style=flat-square)](.)
 [![PRs Open](https://img.shields.io/badge/PRs%20Open-3-f0a500?style=flat-square)](.)
-[![Security Findings](https://img.shields.io/badge/Security%20Findings-1-e11d48?style=flat-square)](.)
+[![Security Findings](https://img.shields.io/badge/Security%20Findings-2-e11d48?style=flat-square)](.)
 
 </div>
 
@@ -149,6 +149,34 @@ Result: after regenerating an MCP token, the Integrations page showed the old (n
 ```
 
 **Response:** niwinz (core maintainer, original PR author) confirmed the bug, suggested this exact fix approach, and merged same day. Added to milestone v2.17.0.
+
+---
+
+### 7 · affaan-m/ECC — `find -exec rm` bypass via compound commands in gateguard security hook
+**Repo:** [affaan-m/ECC](https://github.com/affaan-m/ECC) · **217K+ ⭐**
+**Issue:** [#2291](https://github.com/affaan-m/ECC/issues/2291) · **Fix PR:** [#2292](https://github.com/affaan-m/ECC/pull/2292) ✅ Merged · **Date:** Jun 18, 2026
+
+The `gateguard-fact-force.js` security hook splits shell commands via `splitCommandSegments` and then checks each segment for destructive patterns. The problem: `splitCommandSegments` strips quoted strings before splitting — so when the output was fed to `isDestructiveFindExec`, the function received already-processed segments, missing `find -exec rm` patterns that appeared after compound operators (`&&`, `;`, `|`, `||`).
+
+```javascript
+// Before — find-exec check ran on post-stripped segments, bypass possible
+const segments = bodies.flatMap(splitCommandSegments);
+for (const segment of segments) {
+  if (isDestructiveFindExec(segment)) return true;  // ⚠️ missed after && ; | ||
+}
+
+// After — check raw sub-commands for find-exec BEFORE any stripping
+const bodies = collectExecutableBodies(raw);
+for (const body of bodies) {
+  for (const rawSeg of body.split(/[;|&]+/).map(s => s.trim()).filter(Boolean)) {
+    if (isDestructiveFindExec(rawSeg)) return true;  // ✅ catches all compound patterns
+  }
+}
+```
+
+Bypass vectors patched: `ls && find . -exec rm -rf {} \;`, `echo ok; find . -exec rm {} \;`, `cat file | find . -exec rm {} \;`, `false || find . -exec rm -rf {} \;`.
+
+**Response:** Maintainer merged without comment — security fix silently accepted.
 
 
 ## ⏳ Open / Pending
@@ -287,6 +315,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 | Date | Repo | Commits Analyzed | Outcome |
 |:-----|:-----|:----------------:|:--------|
+| Jun 18 | affaan-m/ECC | gateguard security hook | Security bypass: `find -exec rm` via `&&` `;` `\|` `\|\|` → issue #2291 → PR #2292 merged ✅ |
 | Jun 18 | penpot/penpot | MCP token state refactor | MCP token stale state → issue #10279 → PR #10280 merged in v2.17.0 ✅ |
 | Jun 17 | harry0703/MoneyPrinterTurbo | llm.py error path | 🔒 Credential leak → issue #1049 → fix confirmed on main (a810d67) |
 | Jun 16 | magento/magento2 | ACP2E-4998 adjacent | NoSuchEntityException race → issue #40882 → PR #40883 |
