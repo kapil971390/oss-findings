@@ -8,11 +8,26 @@
 
 <div align="center">
 
-[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-15+-0f0c29?style=flat-square)](.)
-[![Total Reported](https://img.shields.io/badge/Total%20Reported-15-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-7-2ea44f?style=flat-square)](.)
-[![PRs Open](https://img.shields.io/badge/PRs%20Open-3-f0a500?style=flat-square)](.)
-[![Security Findings](https://img.shields.io/badge/Security%20Findings-2-e11d48?style=flat-square)](.)
+[![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-29+-0f0c29?style=flat-square)](.)
+[![Total Reported](https://img.shields.io/badge/Total%20Reported-35+-302b63?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-12-2ea44f?style=flat-square)](.)
+[![PRs Open](https://img.shields.io/badge/PRs%20Open-8-f0a500?style=flat-square)](.)
+[![Security Findings](https://img.shields.io/badge/Security%20Findings-3-e11d48?style=flat-square)](.)
+[![Release Notes](https://img.shields.io/badge/Release%20Notes-1-7c3aed?style=flat-square)](.)
+
+</div>
+
+---
+
+## 🏆 Milestones
+
+### Named in CodeceptJS v4.0.8 Release Notes
+
+> *"fix: guard sort() with shuffle check so --shuffle is not silently ignored by **@kapil971390** in [#5639](https://github.com/codeceptjs/CodeceptJS/pull/5639)"*
+>
+> *"**@kapil971390** made their first contribution in [#5639](https://github.com/codeceptjs/CodeceptJS/pull/5639)"*
+
+— [CodeceptJS v4.0.8 Release](https://github.com/codeceptjs/CodeceptJS/releases/tag/4.0.8) · Published Jun 17, 2026
 
 </div>
 
@@ -313,22 +328,25 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 ## 📊 Analysis Log
 
-| Date | Repo | Commits Analyzed | Outcome |
-|:-----|:-----|:----------------:|:--------|
-| Jun 18 | affaan-m/ECC | gateguard security hook | Security bypass: `find -exec rm` via `&&` `;` `\|` `\|\|` → issue #2291 → PR #2292 merged ✅ |
-| Jun 18 | penpot/penpot | MCP token state refactor | MCP token stale state → issue #10279 → PR #10280 merged in v2.17.0 ✅ |
-| Jun 17 | harry0703/MoneyPrinterTurbo | llm.py error path | 🔒 Credential leak → issue #1049 → fix confirmed on main (a810d67) |
-| Jun 16 | magento/magento2 | ACP2E-4998 adjacent | NoSuchEntityException race → issue #40882 → PR #40883 |
-| Jun 14 | bagisto/bagisto | 2 | 2 security bugs → issues #11338 (path traversal) #11339 (XSS) |
-| Jun 14 | apify/crawlee-python | 3 | Behavioral findings — silent URL filtering, exception propagation change |
-| Jun 14 | tox-dev/tox | 1 | Config override namespace risk identified |
-| Jun 14 | gptme/gptme | 1 | LLM routing refactor — HIGH risk noted |
-| Jun 14 | erictik/midjourney-api | 1 | 2 confirmed bugs → issues #294 #295 opened |
-| Jun 13 | harry0703/MoneyPrinterTurbo | cli.py | Issue #1032 → PR #1033 merged ✅ |
-| Jun 10 | harry0703/MoneyPrinterTurbo | groq fix | Issue #1013 → PR #1014 merged ✅ |
-| Jun 5 | codeceptjs/CodeceptJS | commit #5438 | shuffle regression → issue #5605 → PR #5639 merged ✅ |
-| Jun 4 | medusajs/medusa | payment step | Discussion #15550 |
-| Jun 4 | harry0703/MoneyPrinterTurbo | qwen fix | Issue #984 → PR #994 merged ✅ |
+| Date | Repo | Finding | Outcome |
+|:-----|:-----|:--------|:--------|
+| Jun 29 | denoland/deno | `BTreeSet::contains` byte-exact match misses case-insensitive npm names in trust-policy | PR [#35520](https://github.com/denoland/deno/pull/35520) merged ✅ — *"bug is real and your analysis is spot on"* — bartlomieju |
+| Jun 26 | harry0703/MoneyPrinterTurbo | `youtube_shorts` platform name not matched — metadata silently dropped on upload | PR [#1078](https://github.com/harry0703/MoneyPrinterTurbo/pull/1078) merged ✅ |
+| Jun 25 | palmier-io/palmier-pro | CFTypeID guard missing on timecode format description — fatal crash on XMEML export | PR [#150](https://github.com/palmier-io/palmier-pro/pull/150) merged ✅ |
+| Jun 22 | harry0703/MoneyPrinterTurbo | `match_materials_to_script` flag missing from REST API DTO — chronological term gen unreachable | PR [#1065](https://github.com/harry0703/MoneyPrinterTurbo/pull/1065) merged ✅ |
+| Jun 22 | bytedance/deer-flow | `_lock` defined but never acquired in token budget — data race on concurrent runs | PR [#3714](https://github.com/bytedance/deer-flow/pull/3714) merged ✅ |
+| Jun 21 | krillinai/KrillinAI | Path traversal in DownloadFile handler — API keys readable via `/api/file/config/config.toml` | PR [#297](https://github.com/krillinai/KrillinAI/pull/297) merged ✅ |
+| Jun 18 | affaan-m/ECC | gateguard security hook bypassed via `find -exec &&` compound commands | PR [#2292](https://github.com/affaan-m/ECC/pull/2292) merged ✅ |
+| Jun 18 | penpot/penpot | MCP token stale state until page refresh | PR [#10280](https://github.com/penpot/penpot/pull/10280) merged in v2.17.0 ✅ |
+| Jun 17 | harry0703/MoneyPrinterTurbo | 🔒 Credential leak in LLM error path | Fix confirmed on main (a810d67) ✅ |
+| Jun 16 | magento/magento2 | `NoSuchEntityException` fails entire bulk base-prices batch | PR [#40883](https://github.com/magento/magento2/pull/40883) open |
+| Jun 14 | bagisto/bagisto | Path traversal + XSS (2 issues) | FP — already defended |
+| Jun 14 | erictik/midjourney-api | `ChannelId` used as `ServerId` + dead code in `cacheCommand()` | PRs open |
+| Jun 13 | harry0703/MoneyPrinterTurbo | CLI local source validation gaps | PR [#1033](https://github.com/harry0703/MoneyPrinterTurbo/pull/1033) merged ✅ |
+| Jun 10 | harry0703/MoneyPrinterTurbo | Groq model name not validated on list fetch failure | PR [#1014](https://github.com/harry0703/MoneyPrinterTurbo/pull/1014) merged ✅ |
+| Jun 5 | codeceptjs/CodeceptJS | `--shuffle` flag silently ignored after #5438 | PR [#5639](https://github.com/codeceptjs/CodeceptJS/pull/5639) merged ✅ — named in v4.0.8 release notes 🏆 |
+| Jun 4 | medusajs/medusa | Race condition in `compensatePaymentIfNeededStep` | Discussion #15550 open |
+| Jun 4 | harry0703/MoneyPrinterTurbo | Qwen empty `choices[]` crash | PR [#994](https://github.com/harry0703/MoneyPrinterTurbo/pull/994) merged ✅ |
 
 ---
 
