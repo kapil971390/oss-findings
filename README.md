@@ -22,6 +22,18 @@
 
 ## 🏆 Milestones
 
+### Merged into bytedance/deer-flow — v2.1.0 Release Note UPCOMING
+
+PR [#3714](https://github.com/bytedance/deer-flow/pull/3714) — `fix(token-budget): _lock never acquired — data race on concurrent runs`
+
+`TokenBudgetMiddleware` defined `self._lock = threading.Lock()` in `__init__` and acquired it only in `reset()`. The four methods that mutate per-run state — `before_agent`, `_apply`, `_clear_run_state`, and `_drain_pending_warnings` — all accessed the same `BoundedDict` structures without holding the lock, creating a data race on concurrent runs.
+
+Merged by **WillemJiang** on Jun 22, 2026 — all CI passed (backend + frontend + e2e + lint). PR is tagged under the **v2.1.0 milestone** — name will appear in the next release notes.
+
+> **deer-flow** · ⭐ 75K stars · 10K forks · ByteDance open-source AI agent framework
+
+---
+
 ### Merged into n8n — 194K stars (Biggest repo yet)
 
 PR [#32801](https://github.com/n8n-io/n8n/pull/32801) — `fix(core): Include IPv6 loopback [::1] in MCP redirect URI DTO validation`
@@ -369,7 +381,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 | Jun 26 | harry0703/MoneyPrinterTurbo | `youtube_shorts` platform name not matched — metadata silently dropped on upload | PR [#1078](https://github.com/harry0703/MoneyPrinterTurbo/pull/1078) merged ✅ |
 | Jun 25 | palmier-io/palmier-pro | CFTypeID guard missing on timecode format description — fatal crash on XMEML export | PR [#150](https://github.com/palmier-io/palmier-pro/pull/150) merged ✅ |
 | Jun 22 | harry0703/MoneyPrinterTurbo | `match_materials_to_script` flag missing from REST API DTO — chronological term gen unreachable | PR [#1065](https://github.com/harry0703/MoneyPrinterTurbo/pull/1065) merged ✅ |
-| Jun 22 | bytedance/deer-flow | `_lock` defined but never acquired in token budget — data race on concurrent runs | PR [#3714](https://github.com/bytedance/deer-flow/pull/3714) merged ✅ |
+| Jun 22 | bytedance/deer-flow ⭐ 75K (ByteDance) | `_lock` defined but never acquired in token budget — data race on concurrent runs | PR [#3714](https://github.com/bytedance/deer-flow/pull/3714) merged ✅ — **v2.1.0 release note UPCOMING** |
 | Jun 21 | krillinai/KrillinAI | Path traversal in DownloadFile handler — API keys readable via `/api/file/config/config.toml` | PR [#297](https://github.com/krillinai/KrillinAI/pull/297) merged ✅ |
 | Jun 18 | affaan-m/ECC | gateguard security hook bypassed via `find -exec &&` compound commands | PR [#2292](https://github.com/affaan-m/ECC/pull/2292) merged ✅ |
 | Jun 18 | penpot/penpot | MCP token stale state until page refresh | PR [#10280](https://github.com/penpot/penpot/pull/10280) merged in v2.17.0 ✅ |
