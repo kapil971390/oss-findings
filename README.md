@@ -10,16 +10,29 @@
 
 [![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-29+-0f0c29?style=flat-square)](.)
 [![Total Reported](https://img.shields.io/badge/Total%20Reported-35+-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-12-2ea44f?style=flat-square)](.)
-[![PRs Open](https://img.shields.io/badge/PRs%20Open-8-f0a500?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-13-2ea44f?style=flat-square)](.)
+[![PRs Open](https://img.shields.io/badge/PRs%20Open-7-f0a500?style=flat-square)](.)
 [![Security Findings](https://img.shields.io/badge/Security%20Findings-3-e11d48?style=flat-square)](.)
 [![Release Notes](https://img.shields.io/badge/Release%20Notes-1-7c3aed?style=flat-square)](.)
+[![Biggest Repo](https://img.shields.io/badge/Biggest%20Merge-n8n%20194K%20stars-f59e0b?style=flat-square)](https://github.com/n8n-io/n8n/pull/32801)
 
 </div>
 
 ---
 
 ## 🏆 Milestones
+
+### Merged into n8n — 194K stars (Biggest repo yet)
+
+PR [#32801](https://github.com/n8n-io/n8n/pull/32801) — `fix(core): Include IPv6 loopback [::1] in MCP redirect URI DTO validation`
+
+`isLocalhost` in the MCP redirect URI DTO only checked `localhost` and `127.0.0.1`, but the runtime `isLoopbackHost` also accepts `[::1]`. An admin trying to save `http://[::1]:3000/callback` hit a validation error — *"HTTPS required for redirect URI"* — even though the same URI was correctly recognised as loopback at runtime.
+
+Merged by **nikhilkuria** on Jun 29, 2026 — went through n8n's internal review queue (GHC-8773, ~1 month wait).
+
+> **n8n** · ⭐ 194K stars · 58K forks · Enterprise workflow automation platform
+
+---
 
 ### Named in CodeceptJS v4.0.8 Release Notes
 
@@ -48,7 +61,28 @@ Each finding comes from deep commit-level diff analysis — examining what chang
 
 ## ✅ Confirmed & Fixed
 
-### 1 · MoneyPrinterTurbo — Qwen empty `choices[]` crash
+### 1 · n8n — IPv6 loopback [::1] missing from MCP redirect URI DTO validation
+**Repo:** [n8n-io/n8n](https://github.com/n8n-io/n8n) · **194K+ ⭐ · 58K forks** — *Biggest repo merged into*
+**PR:** [#32801](https://github.com/n8n-io/n8n/pull/32801) ✅ Merged by nikhilkuria · **Date:** Jun 29, 2026
+
+The `isLocalhost` function in `update-allowed-redirect-uris.dto.ts` (DTO validation layer) only checked for `localhost` and `127.0.0.1`. But the runtime `isLoopbackHost` in `oauth-server.service.ts` also accepts `[::1]` (IPv6 loopback). This created a split-brain: an admin saving `http://[::1]:3000/callback` would get a hard validation error — *"HTTPS required for redirect URI"* — at the DTO layer, even though the same URI was correctly accepted as loopback at runtime.
+
+```typescript
+// DTO — BEFORE (missing [::1])
+const isLocalhost = (hostname: string): boolean =>
+  hostname === 'localhost' || hostname === '127.0.0.1';
+
+// Runtime — already correct
+private isLoopbackHost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+}
+```
+
+Fix: added `[::1]` to `isLocalhost` in the DTO to match the runtime check. PR went through n8n's internal review queue (~1 month, tracked as GHC-8773).
+
+---
+
+### 2 · MoneyPrinterTurbo — Qwen empty `choices[]` crash
 **Repo:** [harry0703/MoneyPrinterTurbo](https://github.com/harry0703/MoneyPrinterTurbo) · **89K+ ⭐**
 **Issue:** [#984](https://github.com/harry0703/MoneyPrinterTurbo/issues/984) · **Fix PR:** [#994](https://github.com/harry0703/MoneyPrinterTurbo/pull/994) ✅ Merged · **Date:** Jun 4, 2026
 
@@ -330,6 +364,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 | Date | Repo | Finding | Outcome |
 |:-----|:-----|:--------|:--------|
+| Jun 29 | n8n-io/n8n ⭐ 194K | IPv6 `[::1]` missing from MCP redirect URI DTO — admin gets HTTPS-required error despite runtime accepting it | PR [#32801](https://github.com/n8n-io/n8n/pull/32801) merged ✅ by nikhilkuria — **BIGGEST REPO YET** |
 | Jun 29 | denoland/deno | `BTreeSet::contains` byte-exact match misses case-insensitive npm names in trust-policy | PR [#35520](https://github.com/denoland/deno/pull/35520) merged ✅ — *"bug is real and your analysis is spot on"* — bartlomieju |
 | Jun 26 | harry0703/MoneyPrinterTurbo | `youtube_shorts` platform name not matched — metadata silently dropped on upload | PR [#1078](https://github.com/harry0703/MoneyPrinterTurbo/pull/1078) merged ✅ |
 | Jun 25 | palmier-io/palmier-pro | CFTypeID guard missing on timecode format description — fatal crash on XMEML export | PR [#150](https://github.com/palmier-io/palmier-pro/pull/150) merged ✅ |
