@@ -10,8 +10,8 @@
 
 [![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-29+-0f0c29?style=flat-square)](.)
 [![Total Reported](https://img.shields.io/badge/Total%20Reported-35+-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-13-2ea44f?style=flat-square)](.)
-[![PRs Open](https://img.shields.io/badge/PRs%20Open-7-f0a500?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-14-2ea44f?style=flat-square)](.)
+[![PRs Open](https://img.shields.io/badge/PRs%20Open-6-f0a500?style=flat-square)](.)
 [![Security Findings](https://img.shields.io/badge/Security%20Findings-3-e11d48?style=flat-square)](.)
 [![Release Notes](https://img.shields.io/badge/Release%20Notes-1-7c3aed?style=flat-square)](.)
 [![Biggest Repo](https://img.shields.io/badge/Biggest%20Merge-n8n%20194K%20stars-f59e0b?style=flat-square)](https://github.com/n8n-io/n8n/pull/32801)
@@ -376,6 +376,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 | Date | Repo | Finding | Outcome |
 |:-----|:-----|:--------|:--------|
+| Jul 1 | calesthio/OpenMontage | `success` contract mismatch in CharacterAnimationReviewer — `success=False` on QA issues diverged from `visual_qa.py` pattern; compose-director gates on `status` not `success` | PR [#227](https://github.com/calesthio/OpenMontage/pull/227) merged ✅ by calesthio |
 | Jun 29 | n8n-io/n8n ⭐ 194K | IPv6 `[::1]` missing from MCP redirect URI DTO — admin gets HTTPS-required error despite runtime accepting it | PR [#32801](https://github.com/n8n-io/n8n/pull/32801) merged ✅ by nikhilkuria — **BIGGEST REPO YET** |
 | Jun 29 | denoland/deno | `BTreeSet::contains` byte-exact match misses case-insensitive npm names in trust-policy | PR [#35520](https://github.com/denoland/deno/pull/35520) merged ✅ — *"bug is real and your analysis is spot on"* — bartlomieju |
 | Jun 26 | harry0703/MoneyPrinterTurbo | `youtube_shorts` platform name not matched — metadata silently dropped on upload | PR [#1078](https://github.com/harry0703/MoneyPrinterTurbo/pull/1078) merged ✅ |
@@ -406,3 +407,4 @@ A seller or admin with product-edit access can inject `<script>document.location
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:24243e,50:302b63,100:0f0c29&height=100&section=footer" width="100%"/>
 
 </div>
+
