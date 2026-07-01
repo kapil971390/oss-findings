@@ -10,7 +10,7 @@
 
 [![Repos Analyzed](https://img.shields.io/badge/Repos%20Analyzed-29+-0f0c29?style=flat-square)](.)
 [![Total Reported](https://img.shields.io/badge/Total%20Reported-35+-302b63?style=flat-square)](.)
-[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-14-2ea44f?style=flat-square)](.)
+[![Confirmed Fixed](https://img.shields.io/badge/Confirmed%20Fixed-15-2ea44f?style=flat-square)](.)
 [![PRs Open](https://img.shields.io/badge/PRs%20Open-6-f0a500?style=flat-square)](.)
 [![Security Findings](https://img.shields.io/badge/Security%20Findings-3-e11d48?style=flat-square)](.)
 [![Release Notes](https://img.shields.io/badge/Release%20Notes-1-7c3aed?style=flat-square)](.)
@@ -73,7 +73,36 @@ Each finding comes from deep commit-level diff analysis — examining what chang
 
 ## ✅ Confirmed & Fixed
 
-### 1 · n8n — IPv6 loopback [::1] missing from MCP redirect URI DTO validation
+### 1 · NanmiCoder/MediaCrawler — `IpProxyProvider.get()` returns `None` for unknown proxy provider name
+**Repo:** [NanmiCoder/MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) · **6K+ ⭐** — Social media crawler platform
+**PR:** [#925](https://github.com/NanmiCoder/MediaCrawler/pull/925) ✅ Merged by NanmiCoder · **Labels:** `bug` `lgtm` `size:XS` · **Date:** Jul 1, 2026
+
+`create_ip_pool()` in `proxy/proxy_ip_pool.py` calls `IpProxyProvider.get(config.IP_PROXY_PROVIDER_NAME)` which silently returns `None` when the provider name is unknown (typo, unsupported value, etc.). That `None` is stored as `ProxyIpPool.ip_provider` with no error at construction time. The crash only surfaces when `load_proxies()` is called:
+
+```
+AttributeError: 'NoneType' object has no attribute 'get_proxy'
+```
+
+The error message gives no indication that the root cause is a misconfigured `IP_PROXY_PROVIDER_NAME`.
+
+```python
+# Before — None stored silently
+ip_provider=IpProxyProvider.get(config.IP_PROXY_PROVIDER_NAME),
+
+# After — fail fast with actionable message listing valid options
+ip_provider = IpProxyProvider.get(config.IP_PROXY_PROVIDER_NAME)
+if ip_provider is None:
+    raise ValueError(
+        f"Unknown proxy provider: '{config.IP_PROXY_PROVIDER_NAME}'. "
+        f"Valid options: {list(IpProxyProvider.keys())}"
+    )
+```
+
+**Response:** NanmiCoder merged without comment — labeled `bug`, `lgtm`, `size:XS`.
+
+---
+
+### 2 · n8n — IPv6 loopback [::1] missing from MCP redirect URI DTO validation
 **Repo:** [n8n-io/n8n](https://github.com/n8n-io/n8n) · **194K+ ⭐ · 58K forks** — *Biggest repo merged into*
 **PR:** [#32801](https://github.com/n8n-io/n8n/pull/32801) ✅ Merged by nikhilkuria · **Date:** Jun 29, 2026
 
@@ -376,6 +405,7 @@ A seller or admin with product-edit access can inject `<script>document.location
 
 | Date | Repo | Finding | Outcome |
 |:-----|:-----|:--------|:--------|
+| Jul 1 | [NanmiCoder/MediaCrawler](https://github.com/NanmiCoder/MediaCrawler) | `IpProxyProvider.get()` returns `None` for unknown proxy provider name — silently stored, crashes as `AttributeError: 'NoneType' object has no attribute 'get_proxy'` on `load_proxies()` | PR [#925](https://github.com/NanmiCoder/MediaCrawler/pull/925) merged ✅ — labeled `bug` `lgtm` by NanmiCoder |
 | Jul 1 | calesthio/OpenMontage | `success` contract mismatch in CharacterAnimationReviewer — `success=False` on QA issues diverged from `visual_qa.py` pattern; compose-director gates on `status` not `success` | PR [#227](https://github.com/calesthio/OpenMontage/pull/227) merged ✅ by calesthio |
 | Jun 29 | n8n-io/n8n ⭐ 194K | IPv6 `[::1]` missing from MCP redirect URI DTO — admin gets HTTPS-required error despite runtime accepting it | PR [#32801](https://github.com/n8n-io/n8n/pull/32801) merged ✅ by nikhilkuria — **BIGGEST REPO YET** |
 | Jun 29 | denoland/deno | `BTreeSet::contains` byte-exact match misses case-insensitive npm names in trust-policy | PR [#35520](https://github.com/denoland/deno/pull/35520) merged ✅ — *"bug is real and your analysis is spot on"* — bartlomieju |
